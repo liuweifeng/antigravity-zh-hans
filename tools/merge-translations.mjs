@@ -11,7 +11,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const workDir = path.join(root, 'work');
 
 const wanted = new Set();
-for (const file of ['catalog/strings.json', 'work/missing-ui.json']) {
+for (const file of ['catalog/strings.json', 'work/missing-ui.json', 'work/single-filtered.json']) {
   const p = path.join(root, file);
   if (!fs.existsSync(p)) continue;
   for (const x of JSON.parse(fs.readFileSync(p, 'utf8'))) wanted.add(x.value);
@@ -21,7 +21,7 @@ const placeholders = (s) => (s.match(/%[sdif@]|\{\d+\}|[{}]/g) || []).sort().joi
 
 const merged = new Map();
 const problems = [];
-const batches = fs.readdirSync(workDir).filter((f) => /^(batch|miss2)-\d+\.zh\.json$/.test(f));
+const batches = fs.readdirSync(workDir).filter((f) => /^(batch-\d+|miss2-\d+|single-filtered)\.zh\.json$/.test(f));
 for (const file of batches) {
   let obj;
   try {

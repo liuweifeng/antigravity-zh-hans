@@ -53,5 +53,9 @@
   "Re: {0} — {1}": "回复：{0} — {1}",
   "The preview did not respond on port {0}.": "预览未在端口 {0} 响应。",
   "Failed to update \"{0}\"": "更新「{0}」失败",
-  "Failed to save project: {0}": "保存项目失败：{0}"
+  "Failed to save project: {0}": "保存项目失败：{0}",
+  "When toggled on, {0} will use your AI credits to fulfill model requests once you're out of model quota. {1} will always use your model quota first before using AI credits.": "开启后，{0} 会在模型配额用尽后使用 AI 额度来完成模型请求。{1} 始终会先使用模型配额，再使用 AI 额度。",
+  "Your quota for {0} will reset on {1}. Switch to another available model to continue.": "{0} 的配额将于 {1} 重置。请切换到其他可用模型以继续。",
+  "Your quota for {0} has been reached. Switch to another available model to continue.": "{0} 的配额已用完。请切换到其他可用模型以继续。",
+  "Your plan's baseline quota will refresh on {0}.": "套餐的基础配额将于 {0} 刷新。"
 }

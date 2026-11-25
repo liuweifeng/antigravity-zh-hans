@@ -94,6 +94,18 @@ rsync -a --delete web/ "$HOME/Library/Application Support/Antigravity/zh-web/"
 少数值既是显示文案又是路由/枚举键（例如 `Customizations`、`Projects`），默认跳过；
 确认安全后加入 `translations/allow-presentation.json` 即可只翻译展示位置。
 
+### 服务端文案与运行时覆盖层
+
+设置页的导航项、部分设置说明、人设文案和公告来自 Go 的 `language_server`（协议下发），
+不在前端 bundle 里，改 bundle 无法覆盖。为此构建时会往 `main.js` 末尾追加一个运行时覆盖层
+（`tools/overlay.mjs`）：
+
+- 用完整译文表做精确匹配，替换文本节点与 `aria-label` / `placeholder` / `title` / `alt`；
+- `MutationObserver` 跟随 React 重新渲染；
+- 跳过 `code` / `pre` / 输入框 / 可编辑区 / Monaco 编辑器，避免动到用户内容和代码。
+
+覆盖层只能整句精确匹配，含动态数字的句子（如"额度将在 5 天 15 小时后刷新"）和数值不同时匹配不到。
+
 ## 覆盖率（2.35.1）
 
 - 静态文案：3575 条全部有译文，实际替换 7905 处 / 5948 条不同字符串。
@@ -103,7 +115,8 @@ rsync -a --delete web/ "$HOME/Library/Application Support/Antigravity/zh-web/"
 
 ## 已知遗留
 
-- `Projects`、`Workspaces` 等个别侧栏标题由数组/路由值渲染，仍显示英文。
+- 设置页导航与部分说明来自服务端，靠运行时覆盖层翻译；其中带动态数字的句子匹配不到。
+- `Projects`、`Workspaces` 等个别侧栏标题由数组/路由值渲染，可能仍显示英文。
 - 少数与 `aria-label` 比较的文案（`Delete`、`Cancel`）保持英文，避免破坏对话框逻辑。
 - 含占位符顺序需要调换的模板（如 "{0} for {1}" 译成 "{1} 的 {0}"）暂不支持，只能保持原顺序。
 - 自动更新会整体替换 `.app`，包装脚本失效；更新后重跑 extract / merge / build / install。

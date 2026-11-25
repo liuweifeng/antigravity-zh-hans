@@ -19,6 +19,11 @@ let allowSet = new Set();
 if (allowPath && fs.existsSync(path.resolve(allowPath))) {
   allowSet = new Set(JSON.parse(fs.readFileSync(path.resolve(allowPath), 'utf8')));
 }
+const forcePath = getArg('--force-global', 'translations/force-global.json');
+let forceSet = new Set();
+if (forcePath && fs.existsSync(path.resolve(forcePath))) {
+  forceSet = new Set(JSON.parse(fs.readFileSync(path.resolve(forcePath), 'utf8')));
+}
 
 const srcDir = path.resolve(getArg('--src', 'bundle/pristine'));
 const outDir = path.resolve(getArg('--out', 'web'));
@@ -143,7 +148,11 @@ for (const file of files) {
       if (templates[key]) parsed.get(file).tplHits.push({ start: node.start, end: node.end, key, node });
     }
     const ctx = node.type === 'StringLiteral' ? contextOf(node, ancestors) : null;
-    if (ctx?.logic) ambiguous.add(node.value);
+    if (node.type === 'StringLiteral' && forceSet.has(node.value)) {
+      const parent = ancestors[ancestors.length - 1];
+      const isKey = parent?.type === 'ObjectProperty' && parent.key === node;
+      if (!isKey) parsed.get(file).hits.push({ start: node.start, end: node.end, value: node.value, forced: true });
+    } else if (ctx?.logic) ambiguous.add(node.value);
     else if (ctx && ctx.presentation && dict.has(node.value)) parsed.get(file).hits.push({ start: node.start, end: node.end, value: node.value });
     ancestors.push(node);
     for (const k of Object.keys(node)) {
@@ -170,7 +179,7 @@ for (const [file, { source, hits, tplHits }] of parsed) {
   for (const h of hits) {
     if (tplRanges.some(([s, e]) => h.start >= s && h.end <= e)) continue;
     const zh = dict.get(h.value);
-    if (ambiguous.has(h.value) && !forceAmbiguous && !allowSet.has(h.value)) {
+    if (!h.forced && ambiguous.has(h.value) && !forceAmbiguous && !allowSet.has(h.value)) {
       if (!skippedAmbiguous.includes(h.value)) skippedAmbiguous.push(h.value);
       continue;
     }

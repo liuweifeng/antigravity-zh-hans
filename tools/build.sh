@@ -17,6 +17,9 @@ fi
 echo "== patch =="
 node tools/patch.mjs --map translations/zh-Hans.json
 
+echo "== overlay =="
+node tools/overlay.mjs
+
 echo "== syntax check =="
 for f in web/main.js web/page_agent_bundle.js web/page_facade_bundle.js; do
   node --check "$f" && echo "ok $f"

@@ -7,6 +7,9 @@ BUNDLE=${1:-"$ROOT/web"}
 PORT=${PORT:-8899}
 CSRF=${CSRF:-local-preview}
 BIN="/Applications/Antigravity.app/Contents/Resources/bin/language_server"
+# When install.sh has wrapped the binary, bypass the wrapper so previews are not
+# redirected to the installed bundle.
+[ -x "$BIN.real" ] && BIN="$BIN.real"
 
 exec "$BIN" \
   --standalone \
