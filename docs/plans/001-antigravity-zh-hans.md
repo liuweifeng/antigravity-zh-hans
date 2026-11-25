@@ -35,8 +35,10 @@ Antigravity 没有语言包。界面是 Closure 编译的 Web UI bundle（`main.
 - [x] 提取并按上下文清洗词表
 - [x] AST 安全替换 + 生成 web/
 - [x] 包装脚本安装 / 还原，实测服务返回中文
-- [ ] 翻译全量词表（待定范围）
-- [ ] 处理模板字符串与路由键同名项
+- [x] 翻译全量词表（3575 条 + 补充 2547 条）
+- [x] 整句模板支持（templates.json）
+- [x] 无头 Chrome 加载页面验证：首页中文正常渲染
+- [ ] 逐屏人工校对（设置页、弹窗、命令面板）
 
 ## 验证记录
 
@@ -44,6 +46,8 @@ Antigravity 没有语言包。界面是 Closure 编译的 Web UI bundle（`main.
 - `GET /main.js` → 200，12798660 字节，含「设置」「关闭」「返回」，语法可编译
 - 包装脚本 `--stamp` 正常，带真实 Electron 参数启动后同样返回汉化 bundle
 - `uninstall.sh` 后原二进制恢复，`--stamp` 正常
+- 无头 Chrome 带 bootstrap token 打开首页，文本为「新对话 / 自定义 / 暂无对话 / 设置 /
+  嘿，Weifeng，今天想构建点什么？/ 无项目 / 有任何问题尽管问，@ 可提及」，React 正常渲染
 
 ## 风险
 

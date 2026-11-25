@@ -3,3 +3,4 @@ bundle/
 web/
 *.log
 .DS_Store
+work/
