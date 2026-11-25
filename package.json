@@ -1,0 +1,18 @@
+{
+  "name": "antigravity-zh-hans",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Extract and localize the Antigravity desktop app web UI (Simplified Chinese)",
+  "type": "module",
+  "scripts": {
+    "extract": "node tools/extract-bundle.mjs",
+    "strings": "node tools/extract-strings.mjs bundle/pristine/main.js bundle/pristine/page_agent_bundle.js bundle/pristine/page_facade_bundle.js",
+    "build:demo": "node tools/patch.mjs --map translations/zh-Hans.demo.json",
+    "preview": "./tools/preview.sh \"$PWD/web\"",
+    "install:zh": "./tools/install.sh \"$PWD/web\"",
+    "uninstall": "./tools/uninstall.sh"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.29.15"
+  }
+}
