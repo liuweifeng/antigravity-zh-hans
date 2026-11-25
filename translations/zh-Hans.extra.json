@@ -125,5 +125,12 @@
   "Plans the work, makes design decisions, and reviews the result. Pick a top-tier model. You can also pick one per conversation from the Orchestrator row in the model menu.": "负责规划工作、做设计决策并审查结果。请选择顶级模型。你也可以在模型菜单的编排器一行中为每个对话单独选择。",
   "Configure allowed and denied URLs for the browser subagent (invoked with /browser). Requires Google Chrome.": "配置浏览器子智能体（通过 /browser 调用）允许和禁止的网址。需要 Google Chrome。",
   "When toggled on, Antigravity will use your AI credits to fulfill model requests once you're out of model quota. Antigravity will always use your model quota first before using AI credits.": "开启后，Antigravity 会在模型配额用尽后使用 AI 额度来完成模型请求。Antigravity 始终会先使用模型配额，再使用 AI 额度。",
-  "When toggled on, Antigravity Zh Preview will use your AI credits to fulfill model requests once you're out of model quota. Antigravity Zh Preview will always use your model quota first before using AI credits.": "开启后，Antigravity 会在模型配额用尽后使用 AI 额度来完成模型请求。Antigravity 始终会先使用模型配额，再使用 AI 额度。"
+  "When toggled on, Antigravity Zh Preview will use your AI credits to fulfill model requests once you're out of model quota. Antigravity Zh Preview will always use your model quota first before using AI credits.": "开启后，Antigravity 会在模型配额用尽后使用 AI 额度来完成模型请求。Antigravity 始终会先使用模型配额，再使用 AI 额度。",
+  "New": "新",
+  "Copy Project Name": "复制项目名称",
+  "Delete Project": "删除项目",
+  "Leaving Soon": "即将下线",
+  "Notice": "提示",
+  "Manage Antigravity app settings.": "管理 Antigravity 应用设置。",
+  "Configure allowed and denied URLs for the browser subagent. It runs in the built-in browser, so no separate browser install is needed.": "配置浏览器子智能体允许和禁止的网址。它运行在内置浏览器中，无需另外安装浏览器。"
 }
