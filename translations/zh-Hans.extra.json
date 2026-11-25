@@ -132,5 +132,8 @@
   "Leaving Soon": "即将下线",
   "Notice": "提示",
   "Manage Antigravity app settings.": "管理 Antigravity 应用设置。",
-  "Configure allowed and denied URLs for the browser subagent. It runs in the built-in browser, so no separate browser install is needed.": "配置浏览器子智能体允许和禁止的网址。它运行在内置浏览器中，无需另外安装浏览器。"
+  "Configure allowed and denied URLs for the browser subagent. It runs in the built-in browser, so no separate browser install is needed.": "配置浏览器子智能体允许和禁止的网址。它运行在内置浏览器中，无需另外安装浏览器。",
+  "Narrow": "窄",
+  "Wide": "宽",
+  "Fill": "填充"
 }
