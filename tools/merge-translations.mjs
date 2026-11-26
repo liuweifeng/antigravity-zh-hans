@@ -44,7 +44,7 @@ for (const file of batches) {
   console.log(`${file}: ${n} kept`);
 }
 
-for (const file of ['translations/zh-Hans.demo.json', 'translations/zh-Hans.extra.json']) {
+for (const file of ['translations/zh-Hans.demo.json', 'translations/zh-Hans.extra.json', 'translations/swarm-extra.json']) {
   const p = path.join(root, file);
   if (!fs.existsSync(p)) continue;
   const curated = JSON.parse(fs.readFileSync(p, 'utf8'));

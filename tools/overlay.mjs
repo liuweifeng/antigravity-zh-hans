@@ -1,7 +1,10 @@
 #!/usr/bin/env node
-// Antigravity's language server serves its own index.html template (the one in
-// the bundle dir is ignored), so the overlay cannot be wired in from the HTML.
-// Instead it is appended to main.js, which IS served from the bundle dir.
+// Build the runtime text overlay.
+//
+// Antigravity serves its own index.html template, so script tags in the bundle
+// dir are ignored. The overlay is therefore appended to main.js (served from
+// the bundle dir) and also shipped as standalone files for the Swarm sidecar,
+// which is a separate HTML app served from ~/.gemini.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,6 +12,8 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const webDir = path.join(root, 'web');
 const dict = JSON.parse(fs.readFileSync(path.join(root, 'translations/zh-Hans.json'), 'utf8'));
+const patternsPath = path.join(root, 'translations/patterns.json');
+const patterns = fs.existsSync(patternsPath) ? JSON.parse(fs.readFileSync(patternsPath, 'utf8')) : [];
 
 const compact = {};
 for (const [en, zh] of Object.entries(dict)) {
@@ -16,17 +21,9 @@ for (const [en, zh] of Object.entries(dict)) {
   compact[en] = zh;
 }
 
-const MARK = '/* zh-overlay */';
-const mainPath = path.join(webDir, 'main.js');
-fs.chmodSync(mainPath, 0o644);
-let main = fs.readFileSync(mainPath, 'utf8');
-const markerAt = main.indexOf(MARK);
-if (markerAt !== -1) main = main.slice(0, markerAt);
-
-const overlay = `
-${MARK}
-(function () {
-  var DICT = ${JSON.stringify(compact)};
+const overlayJs = `(function () {
+  var DICT = window.__ZH_DICT__ || {};
+  var PATTERNS = ${JSON.stringify(patterns)};
   var SKIP_TAGS = { SCRIPT: 1, STYLE: 1, CODE: 1, PRE: 1, TEXTAREA: 1, KBD: 1, SAMP: 1, SVG: 1 };
   var ATTRS = ['aria-label', 'placeholder', 'title', 'alt'];
   var pending = new Set();
@@ -42,13 +39,26 @@ ${MARK}
     return false;
   }
 
+  function lookup(t) {
+    var zh = DICT[t];
+    if (zh && zh !== t) return zh;
+    for (var i = 0; i < PATTERNS.length; i++) {
+      var p = PATTERNS[i];
+      var m;
+      try { m = t.match(new RegExp(p.match)); } catch (e) { continue; }
+      if (!m) continue;
+      return p.zh.replace(/\\$(\\d)/g, function (_, n) { return m[Number(n)] || ''; });
+    }
+    return null;
+  }
+
   function translateText(node) {
     var raw = node.nodeValue;
     if (!raw) return;
     var t = raw.trim();
     if (!t) return;
-    var zh = DICT[t];
-    if (!zh || zh === t) return;
+    var zh = lookup(t);
+    if (!zh) return;
     var lead = raw.slice(0, raw.length - raw.trimStart().length);
     var trail = raw.slice(raw.trimEnd().length);
     node.nodeValue = lead + zh + trail;
@@ -59,9 +69,8 @@ ${MARK}
       var a = ATTRS[i];
       var v = el.getAttribute && el.getAttribute(a);
       if (!v) continue;
-      var t = v.trim();
-      var zh = DICT[t];
-      if (zh && zh !== t) el.setAttribute(a, zh);
+      var zh = lookup(v.trim());
+      if (zh) el.setAttribute(a, zh);
     }
   }
 
@@ -110,10 +119,15 @@ ${MARK}
 })();
 `;
 
-fs.writeFileSync(mainPath, main + overlay);
+fs.writeFileSync(path.join(webDir, 'zh-dict.js'), `window.__ZH_DICT__=${JSON.stringify(compact)};\n`);
+fs.writeFileSync(path.join(webDir, 'zh-overlay.js'), overlayJs);
 
-// the bundle dir's index.html is never served; keep it in sync anyway for previews
-const dictPath = path.join(webDir, 'zh-dict.js');
-fs.writeFileSync(dictPath, `window.__ZH_DICT__=${JSON.stringify(compact)};\n`);
+const MARK = '/* zh-overlay */';
+const mainPath = path.join(webDir, 'main.js');
+fs.chmodSync(mainPath, 0o644);
+let main = fs.readFileSync(mainPath, 'utf8');
+const markerAt = main.indexOf(MARK);
+if (markerAt !== -1) main = main.slice(0, markerAt);
+fs.writeFileSync(mainPath, `${main}\n${MARK}\nwindow.__ZH_DICT__=${JSON.stringify(compact)};\n${overlayJs}`);
 
-console.log(`overlay: ${Object.keys(compact).length} entries appended to web/main.js`);
+console.log(`overlay: ${Object.keys(compact).length} entries, ${patterns.length} patterns -> web/main.js + zh-overlay.js`);

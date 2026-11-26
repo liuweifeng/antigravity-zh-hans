@@ -4,6 +4,7 @@
 # real binary with -web_bundle_path). Nothing inside app.asar or the signed
 # binary is modified, so reverting is a single mv.
 set -eu
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 BIN="/Applications/Antigravity.app/Contents/Resources/bin"
 WEB_DIR=${1:-"$HOME/Library/Application Support/Antigravity/zh-web"}
 
@@ -25,6 +26,12 @@ fi
 exec "\$(dirname "\$0")/language_server.real" "\$@"
 EOF
 chmod +x "$BIN/language_server"
+
+# Swarm board sidecar and the updater dialog live outside the web bundle.
+if command -v node >/dev/null 2>&1; then
+  node "$ROOT/tools/patch-swarm.mjs" "" "$WEB_DIR" || true
+  node "$ROOT/tools/patch-asar.mjs" || true
+fi
 
 echo "installed. web bundle: $WEB_DIR"
 echo "quit and reopen Antigravity to apply."

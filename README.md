@@ -50,6 +50,8 @@ tools/
   find-templates.mjs   找出需要整句翻译的模板字符串
   merge-translations.mjs  合并批次译文 + 校验占位符
   patch.mjs            按 AST 生成 web/（只改展示位置）
+  patch-swarm.mjs      汉化 Swarm 看板 sidecar
+  patch-asar.mjs       字节等长替换 app.asar 里的更新提示
   build.sh             解包 -> 套用 -> 语法自检
   preview.sh           不碰 Antigravity，单独起预览服务
   install.sh           安装（包装 language_server）
@@ -105,6 +107,26 @@ rsync -a --delete web/ "$HOME/Library/Application Support/Antigravity/zh-web/"
 - 跳过 `code` / `pre` / 输入框 / 可编辑区 / Monaco 编辑器，避免动到用户内容和代码。
 
 覆盖层只能整句精确匹配，含动态数字的句子（如"额度将在 5 天 15 小时后刷新"）和数值不同时匹配不到。
+这类句子用 `translations/patterns.json` 的正则规则处理，例如
+`You have used some of your weekly limit, it will fully refresh in 5 days, 13 hours.`
+→「你的每周限额已使用一部分，将在 5 天 13 小时后完全刷新。」
+
+### Swarm 面板（独立 sidecar）
+
+Swarm 看板不是主 UI 的一部分，而是语言服务器解压到
+`~/.gemini/antigravity/builtin/plugins/swarm/sidecars/swarm_board/` 的独立 HTML 应用
+（`index.html` + `app.js`）。`tools/patch-swarm.mjs` 会：
+
+- 复制 `zh-dict.js` / `zh-overlay.js` 进去，并在 `index.html` 末尾注入脚本；
+- 直接替换 `index.html` 与 `app.js` 里跨 `<code>` 标签拼接的整句（覆盖层处理不了这种）。
+
+这些文件在应用升级时才被重新解压，平时重启不会覆盖。
+
+### 更新提示（app.asar）
+
+「No updates available」在 Electron 主进程 `dist/updater.js` 里。`tools/patch-asar.mjs`
+按**字节等长**替换 asar 内的字符串（不重打包、保持所有偏移不变），并把原文件备份为
+`app.asar.orig`；`uninstall.sh` 会一起还原。
 
 ## 覆盖率（2.35.1）
 
