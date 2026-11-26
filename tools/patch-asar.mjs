@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Patch Electron main-process strings in app.asar.
 //
-// Native dialogs (quit confirmation, update check) are drawn by the main process
-// with strings of arbitrary length, so the archive is rebuilt once from the
-// pristine backup and all patches are applied there. asar integrity validation is
-// disabled in this app, so a repacked archive loads normally.
+// Native dialogs and menu labels are drawn by the main process with strings of
+// arbitrary length, so the archive is rebuilt from the pristine backup and all
+// patches are applied there. asar integrity validation is disabled in this app,
+// so a repacked archive loads normally.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -12,12 +12,14 @@ import { execFileSync } from 'node:child_process';
 
 const asarPath = process.argv[2] || '/Applications/Antigravity.app/Contents/Resources/app.asar';
 const backup = `${asarPath}.orig`;
-const source = asarPath;
 
 const EDITS = {
   'dist/updater.js': [
     ["'No updates available'", "'已是最新版本'"],
     ["'Check for Updates'", "'检查更新'"],
+    ["'Checking for Updates...'", "'正在检查更新…'"],
+    ["'Downloading Update...'", "'正在下载更新…'"],
+    ["'Restart to Update'", "'重启以更新'"],
     ["buttons: ['OK']", "buttons: ['确定']"],
   ],
   'dist/main.js': [
@@ -26,7 +28,23 @@ const EDITS = {
     ["message: 'Are you sure you want to quit?'", "message: '确定要退出吗？'"],
     ["detail: 'There may be agents or background tasks running.'", "detail: '可能有智能体或后台任务正在运行。'"],
   ],
+  'dist/menu.js': [
+    ["'Actual Size'", "'实际大小'"],
+    ["'Zoom In'", "'放大'"],
+    ["'Zoom Out'", "'缩小'"],
+    ["label: 'New Window'", "label: '新建窗口'"],
+    ["label: 'Docs'", "label: '文档'"],
+    ["label: 'Connect to WSL'", "label: '连接到 WSL'"],
+    ["label: 'Reopen Locally'", "label: '在本机重新打开'"],
+    ["'Failed to list WSL distros:'", "'获取 WSL 发行版列表失败：'"],
+  ],
 };
+
+const MARKERS = ['已是最新版本', '确定要退出吗', '实际大小'];
+
+const asarBuf = fs.readFileSync(asarPath);
+const patched = MARKERS.some((m) => asarBuf.includes(m));
+const source = patched && fs.existsSync(backup) ? backup : asarPath;
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'asar-zh-'));
 const unpackDir = 'node_modules/chrome-devtools-mcp';
@@ -60,10 +78,10 @@ try {
     process.exit(0);
   }
 
-  const outTmp = path.join(tmp, '..', `app-${process.pid}.asar`);
+  const outTmp = path.join(os.tmpdir(), `app-${process.pid}.asar`);
   execFileSync('npx', [...asarCli, 'pack', tmp, outTmp, '--unpack-dir', unpackDir], { stdio: 'inherit' });
 
-  fs.copyFileSync(asarPath, backup); // keep the pre-patch file of this app version
+  if (!patched) fs.copyFileSync(asarPath, backup);
   fs.copyFileSync(outTmp, asarPath);
 
   const unpackedSrc = `${outTmp}.unpacked`;
