@@ -2,7 +2,7 @@
 
 给 [Antigravity](https://antigravity.google)（Google 的智能体桌面应用，macOS）做简体中文界面的工具链与译文。
 
-当前针对 2.35.1（内置 `language_server` 1.11.0），已验证可正常启动并显示中文。
+当前针对 2.35.2（2.35.1 也验证过；两版 UI 差异只有两条文案）。
 
 ## Antigravity 没有语言包
 

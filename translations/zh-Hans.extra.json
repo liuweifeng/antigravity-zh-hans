@@ -135,5 +135,7 @@
   "Configure allowed and denied URLs for the browser subagent. It runs in the built-in browser, so no separate browser install is needed.": "配置浏览器子智能体允许和禁止的网址。它运行在内置浏览器中，无需另外安装浏览器。",
   "Narrow": "窄",
   "Wide": "宽",
-  "Fill": "填充"
+  "Fill": "填充",
+  "Applies to messages sent after this turn": "适用于本轮之后发送的消息",
+  "Applies to /btw and messages sent after this turn": "适用于 /btw 和本轮之后发送的消息"
 }
