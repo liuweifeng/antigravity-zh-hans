@@ -124,9 +124,10 @@ Swarm 看板不是主 UI 的一部分，而是语言服务器解压到
 
 ### 更新提示（app.asar）
 
-「No updates available」在 Electron 主进程 `dist/updater.js` 里。`tools/patch-asar.mjs`
-按**字节等长**替换 asar 内的字符串（不重打包、保持所有偏移不变），并把原文件备份为
-`app.asar.orig`；`uninstall.sh` 会一起还原。
+原生对话框（退出确认、检查更新）在 Electron 主进程 `dist/main.js`、`dist/updater.js` 里，
+文案长度和英文不一致，`tools/patch-asar.mjs` 会从当前 asar 提取、替换、重新打包（保留
+`chrome-devtools-mcp` 的 unpacked 目录），并把替换前的文件备份为 `app.asar.orig`；
+`uninstall.sh` 会一起还原。应用升级后 asar 变回英文，重跑一次即可。
 
 ## 覆盖率（2.35.1）
 
