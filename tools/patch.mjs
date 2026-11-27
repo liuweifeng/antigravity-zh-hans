@@ -35,7 +35,7 @@ const PRESENTATION_PROPS = new Set([
   'ariaLabel', 'confirmLabel', 'cancelLabel', 'submitLabel', 'emptyText', 'emptyMessage', 'loadingText', 'displayName',
   'summary', 'detail', 'confirmText', 'body', 'header', 'footer', 'notice', 'warning', 'reason', 'prompt', 'greeting',
   'tagline', 'statusText', 'buttonText', 'actionLabel', 'linkText', 'helper', 'errorMessage', 'emptyState', 'noResults',
-  'toast', 'alert', 'emptyMessagePlural', 'emptyMessageSingular'
+  'toast', 'alert', 'emptyMessagePlural', 'emptyMessageSingular', 'capitalized'
 ]);
 
 const DANGEROUS_CALLEES = new Set([

@@ -155,5 +155,6 @@
   " yet": "​",
   "Run a prompt on a schedule, like a morning summary of yesterday's changes. Runs show up here.": "按计划运行提示词，例如每天早上的昨日变更摘要。运行记录会显示在这里。",
   "automations": "自动化",
-  "automation": "自动化"
+  "automation": "自动化",
+  "Archive ": "归档"
 }
