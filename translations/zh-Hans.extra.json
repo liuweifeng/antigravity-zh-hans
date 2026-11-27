@@ -143,5 +143,7 @@
   "Bring over my setup from other Agentic Developer Tools": "从其他智能体开发工具迁移我的配置",
   "Loading plugin...": "正在加载插件…",
   "Loading plugin…": "正在加载插件…",
-  "Loading plugin": "正在加载插件"
+  "Loading plugin": "正在加载插件",
+  "Pin": "固定",
+  "Unpin": "取消固定"
 }
