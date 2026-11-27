@@ -35,7 +35,7 @@ const PRESENTATION_PROPS = new Set([
   'ariaLabel', 'confirmLabel', 'cancelLabel', 'submitLabel', 'emptyText', 'emptyMessage', 'loadingText', 'displayName',
   'summary', 'detail', 'confirmText', 'body', 'header', 'footer', 'notice', 'warning', 'reason', 'prompt', 'greeting',
   'tagline', 'statusText', 'buttonText', 'actionLabel', 'linkText', 'helper', 'errorMessage', 'emptyState', 'noResults',
-  'toast', 'alert'
+  'toast', 'alert', 'emptyMessagePlural', 'emptyMessageSingular'
 ]);
 
 const DANGEROUS_CALLEES = new Set([
@@ -79,12 +79,13 @@ function contextOf(node, ancestors) {
   let presentation = false;
   const parent = ancestors[ancestors.length - 1];
   if (parent?.type === 'ExpressionStatement') return { presentation: false, logic: 'directive' };
+  let prop = null;
   if (parent?.type === 'ObjectProperty') {
-    const prop = parent.key?.name ?? parent.key?.value;
-    if (parent.key !== node && PRESENTATION_PROPS.has(prop)) presentation = true;
-    else if (parent.key !== node && IDENT_PROPS.has(prop)) return { presentation: false, logic: 'ident:' + prop };
-    else if (parent.key !== node && typeof prop === 'string' && (prop.startsWith('data-') || (prop.startsWith('aria-') && !/^aria-(label|description|placeholder)$/.test(prop)))) {
-      return { presentation: false, logic: 'attr:' + prop };
+    const key = parent.key?.name ?? parent.key?.value;
+    if (parent.key !== node && PRESENTATION_PROPS.has(key)) { presentation = true; prop = key; }
+    else if (parent.key !== node && IDENT_PROPS.has(key)) return { presentation: false, logic: 'ident:' + key };
+    else if (parent.key !== node && typeof key === 'string' && (key.startsWith('data-') || (key.startsWith('aria-') && !/^aria-(label|description|placeholder)$/.test(key)))) {
+      return { presentation: false, logic: 'attr:' + key };
     }
   }
   if (parent?.type === 'JSXAttribute') {
@@ -124,7 +125,7 @@ function contextOf(node, ancestors) {
       if (a === 'className' || a === 'style' || a === 'id' || a === 'key' || a === 'role') return { presentation: false, logic: 'attr:' + a };
     }
   }
-  return { presentation, logic: null };
+  return { presentation, logic: null, prop };
 }
 
 function placeholders(s) {
@@ -153,7 +154,7 @@ for (const file of files) {
       const isKey = parent?.type === 'ObjectProperty' && parent.key === node;
       if (!isKey) parsed.get(file).hits.push({ start: node.start, end: node.end, value: node.value, forced: true });
     } else if (ctx?.logic) ambiguous.add(node.value);
-    else if (ctx && ctx.presentation && dict.has(node.value)) parsed.get(file).hits.push({ start: node.start, end: node.end, value: node.value });
+    else if (ctx && ctx.presentation && dict.has(node.value)) parsed.get(file).hits.push({ start: node.start, end: node.end, value: node.value, prop: ctx.prop || null });
     ancestors.push(node);
     for (const k of Object.keys(node)) {
       if (k === 'loc' || k === 'start' || k === 'end' || k.endsWith('Comments')) continue;
@@ -179,7 +180,7 @@ for (const [file, { source, hits, tplHits }] of parsed) {
   for (const h of hits) {
     if (tplRanges.some(([s, e]) => h.start >= s && h.end <= e)) continue;
     const zh = dict.get(h.value);
-    if (!h.forced && ambiguous.has(h.value) && !forceAmbiguous && !allowSet.has(h.value)) {
+    if (!h.forced && !h.prop && ambiguous.has(h.value) && !forceAmbiguous && !allowSet.has(h.value)) {
       if (!skippedAmbiguous.includes(h.value)) skippedAmbiguous.push(h.value);
       continue;
     }
@@ -187,7 +188,7 @@ for (const [file, { source, hits, tplHits }] of parsed) {
       problems.push({ file, value: h.value, reason: `placeholder-mismatch:${placeholders(h.value)}=>${placeholders(zh)}` });
       continue;
     }
-    const final = (h.value.startsWith(' ') ? ' ' : '') + zh.trim() + (h.value.endsWith(' ') ? ' ' : '');
+    const final = zh.trim();
     edits.push({ start: h.start, end: h.end, text: JSON.stringify(final), value: h.value });
   }
 
