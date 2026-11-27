@@ -33,7 +33,6 @@ for (const file of batches) {
   let n = 0;
   for (const [en, zh] of Object.entries(obj)) {
     if (typeof zh !== 'string' || !zh.trim()) continue;
-    if (!wanted.has(en)) continue;
     if (placeholders(en) !== placeholders(zh)) {
       problems.push(`${file}: placeholder mismatch ${JSON.stringify(en)}`);
       continue;
