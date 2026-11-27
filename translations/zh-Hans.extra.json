@@ -145,5 +145,10 @@
   "Loading plugin…": "正在加载插件…",
   "Loading plugin": "正在加载插件",
   "Pin": "固定",
-  "Unpin": "取消固定"
+  "Unpin": "取消固定",
+  "Pin This Conversation": "固定此对话",
+  "Unpin This Conversation": "取消固定此对话",
+  "Archive This Conversation": "归档此对话",
+  "Mark This Conversation as Read": "将此对话标为已读",
+  "Copy Conversation Markdown": "复制对话 Markdown"
 }

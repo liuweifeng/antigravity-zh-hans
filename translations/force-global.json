@@ -4,5 +4,7 @@
   "Shortcuts",
   "Notifications",
   "Models",
-  "Browser"
+  "Browser",
+  "Pin",
+  "Unpin"
 ]
